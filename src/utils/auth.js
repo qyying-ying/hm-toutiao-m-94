@@ -9,7 +9,7 @@ export function setUser (user) {
 // 获取用户的token信息
 export function getUser () {
   // 将字符串转化成对象再返回
-  return JSON.parsr(window.localStorage.getItem(USER_TOKEN) || '{}') // 短路表达式
+  return JSON.parse(window.localStorage.getItem(USER_TOKEN) || '{}') // 短路表达式
 // 如果前面为true 后面不执行 如果前面为false 后面执行
 }
 // 删除用户的token信息
