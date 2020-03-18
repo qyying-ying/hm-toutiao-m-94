@@ -6,7 +6,7 @@ import store from '@/store' // 引入store对象
 router.beforeEach(function (to, from, next) {
 // 需要判断你的请求地址 和你的token
 // 如果是 /user 为起始 说明需要进行token的判断
-  if (to.path.startsWith('/user') && store.state.user.token) {
+  if (to.path.startsWith('/user') && !store.state.user.token) {
     // 需要拦截请求 让他去登陆
     // next('/login') 如果你想去a 被拦截了 去了登录 登录成功应该回到你想去的a
     next({

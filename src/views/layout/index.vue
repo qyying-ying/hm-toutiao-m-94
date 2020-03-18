@@ -2,10 +2,11 @@
   <div class="container">
     <!-- 导航组件 采用vant组件 fixed表示固定在顶部-->
     <!-- 当页面地址是/user的时候 应该隐藏掉导航行 否则不隐藏 -->
-    <van-nav-bar @click-right="$router.push('/search')" fixed title="黑马头条" right-text="搜索" v-if="$route.path!= '/user'"></van-nav-bar>
+    <!-- <van-nav-bar @click-right="$router.push('/search')" fixed title="黑马头条" right-text="搜索" v-if="$route.path!= '/user'"></van-nav-bar> -->
+    <van-nav-bar   @click-right="$router.push('/search')" fixed title="黑马头条" right-text="搜索" v-if="$route.path!== '/user'"></van-nav-bar>
     <!-- 二级路由容器 -->
     <!-- 判断当前的地址 如果是/uesr 就给一个noTopClass -->
-    <div class="my-wrapper" :class="{noTop: $route.path === '/user'}">
+    <div class="my-wrapper" :class="{noTop: !showNavBar}">
     <router-view></router-view>
     </div>
     <!-- 标签组件 -->
@@ -23,8 +24,14 @@
 
 <script>
 export default {
-
+  name: 'layout',
+  computed: {
+    showNavBar () {
+      return this.$route.path !== '/user'
+    }
+  }
 }
+
 </script>
 
 <style scoped lang='less'>
