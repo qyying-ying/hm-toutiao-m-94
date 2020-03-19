@@ -103,8 +103,8 @@ export default {
           this.$router.push(redirectUrl || '/') // 短路表达式
         } catch (error) {
           // 提示消息 提示用户 告诉用户登录失败
-          this.$notify({ message: '用户名或者验证码错误', duration: 800 })
-          // 这里我们要抖一个小机灵
+          // this.$notify({ message: '用户名或者验证码错误', duration: 800 })
+          this.$gnotify({ message: '用户名或者验证码错误' })
         }
       }
     }
