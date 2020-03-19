@@ -9,7 +9,7 @@ const instance = axios.create({
 // 构造参数 传入一些配置 和defaults一样
   baseURL: 'http://ttapi.research.itcast.cn/app/v1_0', // 基础的请求地址
   // 此函数是后台响应回来 但是还没进入到axios的响应拦截器是执行 数组里可以写多个的处理函数
-  transformRequest: [function (data) {
+  transformRespose: [function (data) {
     //   data是后端响应回来的字符串
     // JSONBig.parse()
     return data ? JSONBig.parse(data) : {}

@@ -25,33 +25,40 @@
 </template>
 
 <script>
+// 引入 login方法
+// import * as user from '@/api/user'
+// user.login
+import { login } from '@/api/user'
+import { mapMutations } from 'vuex' // 辅助函数 可以把mutations方法映射到methods方法中
 export default {
   data () {
     return {
       // 表单数据
       loginForm: {
-        mobile: '13911111111', // 手机号
-        code: '246810' // 验证码
+        mobile: '', // 手机号
+        code: '' // 验证码
       },
+      // 此对象专门放置消息
       errorMessage: {
-        mobile: '', // 手机错误消息
-        code: '' // 验证码的错误信息
+        mobile: '', // 手机的错误消息
+        code: '' // 验证码的错误消息
       }
     }
   },
   methods: {
+    ...mapMutations(['updateUser']), // 可以导入需要的方法  直接把updateUser方法映射到当前的methods方法中
     // 定义检查手机号方法
     checkMobile () {
-      // 获取手机号 判断是都为空 满足手机号的格式
+    //  获取手机号 判断 是否为空  满足手机号的格式
       if (!this.loginForm.mobile) {
         // 表示为空
         this.errorMessage.mobile = '手机号不能为空'
         // 此时表示没有不要再往下进行了
         return false // 返回一个false  false表示 此轮校验没通过 如果通过了 返回true
       }
-      // // 第二轮 手机号格式
+      // 第二轮 手机号格式
       if (!/^1[3-9]\d{9}$/.test(this.loginForm.mobile)) {
-        // // 如果手机号不满足正则
+        // 如果手机号不满足正则
         this.errorMessage.mobile = '手机号格式不正确'
         return false
       }
@@ -72,14 +79,33 @@ export default {
       this.errorMessage.code = ''
       return true
     },
-    login () {
-      // this.checkMobile()
-      // this.checkCode()
-      // 校验手机号和验证码
-      if (this.checkMobile() && this.checkCode()) {
-      // 如果两个检查的都是true 就表示通过了校验
-      // 校验通过之后 要去调用接口看看用户名和密码是否正确
-        console.log('denglucheng')
+    // 登录校验
+    async  login () {
+      //  校验手机号和验证码
+      const validateMobile = this.checkMobile()
+      const validateCode = this.checkCode()
+      if (validateMobile && validateCode) {
+        // 如果两个检查都是true 就表示通过 了校验
+        // 校验通过之后 要去调用接口 看看用户名和密码正确与否
+        // axios 但是后端接口 不论你成功或者失败 它返回的状态码都是200
+        try {
+          const result = await login(this.loginForm)
+          // 后端 现在把所有手机号 都认为是成功
+          // console.log(result) // 打印结果
+          // 拿到token之后 应该把token设置vuex中的state
+          // 要去修改vuex中的state必须通过 mutations
+          // this.$store.commit('')  // 原始方式
+          this.updateUser({ user: result }) // 相当于更新当前的token 和 refresh_token
+          // 应该跳转到主页 but 如果此时 你这个登录 是 别人401之后跳转过来的 你就应该回到那个跳转过来的页面
+          // 1 判断是否有需要跳转的页面 如果有 就跳转 如果没有 不用管 直接跳到主页
+          const { redirectUrl } = this.$route.query // query查询参数 也就是 ?后边的参数表
+          // redirectUrl有值的话 跳到该地址 没值的话 跳到 主页
+          this.$router.push(redirectUrl || '/') // 短路表达式
+        } catch (error) {
+          // 提示消息 提示用户 告诉用户登录失败
+          this.$notify({ message: '用户名或者验证码错误', duration: 800 })
+          // 这里我们要抖一个小机灵
+        }
       }
     }
   }
