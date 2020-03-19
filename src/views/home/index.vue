@@ -3,11 +3,13 @@
     <van-tabs>
       <van-tab :title="`标签${item}`" v-for="item in 10" :key="item">
         <!-- 生成若干个单元格 -->
-        <div class="scroll-wrapper">
+        <!-- <div class="scroll-wrapper">
           <van-cell-group>
            <van-cell title="111" value="222" :key="item" v-for="item in 20"></van-cell>
           </van-cell-group>
-        </div>
+        </div> -->
+        <!-- 有多少个tab 就有多少个article-list 相当于多个article-list实例 -->
+        <ArticleList></ArticleList>
       </van-tab>
     </van-tabs>
     <span class="bar_btn">
@@ -17,9 +19,12 @@
 </template>
 
 <script>
+import ArticleList from './components/article-list'
 export default {
   name: 'Home',
-  components: {}
+  components: {
+    ArticleList
+  }
 }
 </script>
 <style lang="less" scoped>
