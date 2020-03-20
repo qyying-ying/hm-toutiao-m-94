@@ -87,7 +87,7 @@ export default {
       // this.timestamp || Date.now()  如果有历史时间戳 用历史时间戳 否则用当前的时间戳
       const data = await getArticles({ channel_id: this.channel_id, timestamp: this.timestamp || Date.now() }) // this.channel_id指的是 当前的频道id
       // 获取内容
-      this.articles.push(data.results) // 将数据追加到队尾
+      this.articles.push(...data.results) // 将数据追加到队尾
       this.upLoading = false // 关闭加载状态
       // 将历史时间戳给timestamp 但是赋值之前需要判断历史时间戳是否为0
       // 如果历史时间戳为0 说明此事已经没有数据了 应该直接将finished设置为true
