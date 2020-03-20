@@ -10,7 +10,7 @@
       <van-list finished-text="have no" v-model="upLoading" :finished="finished" @load="onLoad">
         <!-- 循环内容 -->
         <van-cell-group>
-          <van-cell v-for="item in articles" :key="item">
+          <van-cell v-for="item in articles" :key="item.art_id">
             <!-- 放置文章列表的循环项 无图 单图 三图-->
             <div class="article_item">
               <!-- 标题 -->
@@ -43,6 +43,8 @@
 </template>
 
 <script>
+// 引入获取文章模块
+import { getArticles } from '@/api/articles'
 export default {
   data () {
     return {
@@ -65,23 +67,35 @@ export default {
   },
   methods: {
     // 上拉加载
-    onLoad () {
-      console.log('start loading')
-      if (this.articles.length > 50) {
-        this.finished = true // 关闭加载
-      } else {
-        const arr = Array.from(
-          Array(15),
-          (value, index) => this.articles.length + index + 1
-        )
-        // 上拉加载 不是覆盖之前的数据 应该把数据追加到数组的队尾
-        this.articles.push(...arr)
-        // 加载完数据 需要手动关掉loading
-        this.upLoading = false
-      }
+    async onLoad () {
+      console.log('开始加载文章列表数据')
+      // if (this.articles.length > 50) {
+      //   this.finished = true // 关闭加载
+      // } else {
+      //   const arr = Array.from(
+      //     Array(15),
+      //     (value, index) => this.articles.length + index + 1
+      //   )
+      //   // 上拉加载 不是覆盖之前的数据 应该把数据追加到数组的队尾
+      //   this.articles.push(...arr)
+      //   // 加载完数据 需要手动关掉loading
+      //   this.upLoading = false
+      // }
       //   setTimeout(() => {
       //     this.finished = true // 表示数据已经全部加载完毕 没有数据了
       //   }, 1000)
+      // this.timestamp || Date.now()  如果有历史时间戳 用历史时间戳 否则用当前的时间戳
+      const data = await getArticles({ channel_id: this.channel_id, timestamp: this.timestamp || Date.now() }) // this.channel_id指的是 当前的频道id
+      // 获取内容
+      this.articles.push(data.results) // 将数据追加到队尾
+      this.upLoading = false // 关闭加载状态
+      // 将历史时间戳给timestamp 但是赋值之前需要判断历史时间戳是否为0
+      // 如果历史时间戳为0 说明此事已经没有数据了 应该直接将finished设置为true
+      if (data.pre_timestamp) {
+        this.timestamp = data.pre_timestamp
+      } else {
+        this.finished = true
+      }
     },
     // 下拉刷新
     onRefresh () {
