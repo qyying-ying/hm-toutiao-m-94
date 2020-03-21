@@ -54,7 +54,28 @@
 // 引入获取文章模块
 import { mapState } from 'vuex'
 import { getArticles } from '@/api/articles'
+import eventBus from '@/utils/eventbus'
 export default {
+  // 初始化函数
+  created () {
+    // 监听删除文章事件
+    // 相当于有多少个实例 就有多少个监听
+    eventBus.$on('delArticle', (artId, channelId) => {
+      // 这里要判断一下 传递过来的的频道是否等于自身的频道
+      if (channelId === this.channel_id) {
+      // 说明当前的这个article-list实例 就是我们要去删除数据的实例
+        const index = this.articles.findIndex(item => item.art_id.toString() === artId)
+        if (index > -1) {
+          this.articles.splice(index, 1) // 删除对应下标的数据
+        }
+        // 但是如果一只删除 就会将列表数据删光 并不会触发load事件
+        if (this.articles.length === 0) {
+          // 说明数据删光了
+          this.onLoad() // 手动的触发onload事件 给页面加数据
+        }
+      }
+    })
+  },
   computed: {
     ...mapState(['user']) // 将user属性映射到计算属性中
   },

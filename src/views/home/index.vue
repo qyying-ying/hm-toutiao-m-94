@@ -1,6 +1,7 @@
 <template>
   <div class="container">
-    <van-tabs>
+    <!-- 默认绑定激活页签 -->
+    <van-tabs v-model="activeIndex">
       <van-tab :title="item.name" v-for="item in channels" :key="item.id">
         <!-- 生成若干个单元格 -->
         <!-- <div class="scroll-wrapper">
@@ -32,6 +33,7 @@ import ArticleList from './components/article-list'
 import MoreAction from './components/more-action'
 import { getMyChannels } from '@/api/channels'
 import { dislikeArticle } from '@/api/articles'
+import eventbus from '@/utils/eventbus' // 公共事件处理器
 export default {
   name: 'Home',
   components: {
@@ -41,7 +43,8 @@ export default {
     return {
       channels: [], // 接收频道数据
       showMoreAction: false, // 是否显示弹层 默认不显示
-      articleId: null // 用来接收点击的文章id
+      articleId: null, // 用来接收点击的文章id
+      activeIndex: 0 // 当前默认激活的页签0
     }
   },
   methods: {
@@ -65,6 +68,11 @@ export default {
           type: 'success',
           message: '操作成功'
         })
+        // 应该触发一个事件 利用事件广播的机制 通知对应的tab 来删除文章数据
+        // this.channels[this.activeIndex].id 当前激活的频道数据
+        eventbus.$emit('delArticle', this.articleId, this.channels[this.activeIndex].id) // 名称， 参数
+        // 监听了这个事件组件 就要根据id来删除数据
+        this.showMoreAction = false // 此时关闭弹层
       } catch (error) {
         this.$gnotify({
           message: '操作失败'
