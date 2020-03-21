@@ -23,7 +23,8 @@
     <van-popup v-model="showMoreAction" style="width: 80%">
       <!-- 放置反馈组件 -->
       <!-- 应该在此位置监听more-action触发的事件 -->
-      <MoreAction @dislike="dislikeArticle" />
+      <!-- 不喜欢文章和举报文章用一个方法 -->
+      <MoreAction @dislike="dislikeOrReport('dislike')" @report="dislikeOrReport('report', $event)"/>
     </van-popup>
   </div>
 </template>
@@ -32,7 +33,7 @@
 import ArticleList from './components/article-list'
 import MoreAction from './components/more-action'
 import { getMyChannels } from '@/api/channels'
-import { dislikeArticle } from '@/api/articles'
+import { dislikeArticle, reportArticle } from '@/api/articles'
 import eventbus from '@/utils/eventbus' // 公共事件处理器
 export default {
   name: 'Home',
@@ -57,12 +58,15 @@ export default {
       // 应该把id给存储起来
       this.articleId = artId
     },
-    async dislikeArticle () {
+    // 对文章不感兴趣
+    // operateType是操作类型 如果是dislike 就是不喜欢 如果是 report 就是 举报
+    async dislikeOrReport (operateType, type) {
       // 调用不感兴趣的接口
       try {
-        await dislikeArticle({
-          target: this.articleId // 不感兴趣的 id
-        })
+        // 需要根据一个参数来判断 是举报还是不喜欢
+        operateType === 'dislike' ? await dislikeArticle({
+          target: this.articleId // 不感兴趣的id
+        }) : await reportArticle({ target: this.articleId, type }) //  这里的type怎么办 ?????? 通过$event传出来
         // await下方的逻辑是resolve（成功）之后的
         this.$gnotify({
           type: 'success',
@@ -79,6 +83,25 @@ export default {
         })
       }
     }
+    // // 举报文章
+    // async reportArticle (type) {
+    //   try {
+    //     // 调用举报接口
+    //     await reportArticle({ target: this.articleId, type })
+    //     this.$gnotify({
+    //       type: 'success',
+    //       message: '举报成功'
+    //     })
+    //     // action下方认为举报成功
+    //     // 同样的也要将举报的文章删除掉
+    //     eventbus.$emit('delArticle', this.articleId, this.channels[this.activeIndex].id) // 名称， 参数
+    //     this.showMoreAction = false
+    //   } catch (error) {
+    //     this.$gnotify({
+    //       message: '举报失败'
+    //     })
+    //   }
+    // }
   },
   created () {
     this.getMyChannels()

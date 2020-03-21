@@ -18,3 +18,13 @@ export function dislikeArticle (data) {
     // body 参数应该位于 data
   })
 }
+/***
+ * 举报文章接口
+ */
+export function reportArticle (data) {
+  return request({
+    url: '/article/reports',
+    data,
+    method: 'post'
+  })
+}
