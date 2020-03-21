@@ -37,7 +37,8 @@ export default {
   data () {
     return {
       channels: [], // 接收频道数据
-      showMoreAction: false // 是否显示弹层 默认不显示
+      showMoreAction: false, // 是否显示弹层 默认不显示
+      articleId: null // 用来接收点击的文章id
     }
   },
   methods: {
@@ -45,8 +46,10 @@ export default {
       const data = await getMyChannels() // 接收返回的数据结果
       this.channels = data.channels // 将数据赋值给data中的数据
     },
-    openAction () {
+    openAction (artId) {
       this.showMoreAction = true
+      // 应该把id给存储起来
+      this.articleId = artId
     }
   },
   created () {

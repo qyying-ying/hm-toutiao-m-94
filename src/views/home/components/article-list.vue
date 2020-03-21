@@ -38,7 +38,7 @@
                 <!-- 最原始的方式 -->
                 <!-- <span class="close" v-if="$store.state.user.token"> -->
                 <!-- @事件名=“逻辑处理” 点击事件中 触发一个点击显示的事件-->
-                <span @click="$emit('showAction')" class="close" v-if="user.token">
+                <span @click="$emit('showAction', item.art_id.toString())" class="close" v-if="user.token">
                   <van-icon name="cross"></van-icon>
                 </span>
               </div>
