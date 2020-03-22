@@ -9,9 +9,11 @@
         <van-button v-else @click="editing=false" size="mini" type="danger" plain>完成</van-button>
       </div>
       <van-grid class="van-hairline--left">
-        <van-grid-item v-for="index in 8" :key="index">
-          <span class="f12">频道{{index}}</span>
-          <van-icon class="btn" name="cross"></van-icon>
+          <!-- 循环渲染我的频道 -->
+        <van-grid-item v-for="(item, index) in channels" :key="item.id">
+          <span class="f12">{{item.name}}</span>
+          <!-- 叉号标签应该在进入编辑状态时显示 应该在退状态时不显示 -->
+          <van-icon v-if="index!==0 && editing" class="btn" name="cross"></van-icon>
         </van-grid-item>
       </van-grid>
     </div>
@@ -33,6 +35,15 @@ export default {
   data () {
     return {
       editing: false // 正在编辑状态 用这个状态来控制是否显示 删除图标
+    }
+  },
+  //   props: ['channels'] // 接收频道数据
+  props: {
+    channels: {
+    // required必传 type类型 default 默认值
+      required: true,
+      type: Array,
+      default: () => [] // 默认值给一个空数组 表示此函数默认返回一个空数组
     }
   }
 }
