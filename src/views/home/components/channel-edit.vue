@@ -13,7 +13,7 @@
         <van-grid-item v-for="(item, index) in channels" :key="item.id">
           <!-- 点击频道项的时候 需要把当前点击的频道id传出去 也可以传索引 -->
           <!-- <span @click="$emit('selectChannel', item.id)" class="f12">{{item.name}}</span> -->
-         <span @click="$emit('selectChannel', index)" class="f12">{{item.name}}</span>
+         <span @click="$emit('selectChannel', index)" :class="{red: index===activeIndex}" class="f12">{{item.name}}</span>
           <!-- 叉号标签应该在进入编辑状态时显示 应该在退状态时不显示 -->
           <van-icon v-if="index!==0 && editing" class="btn" name="cross"></van-icon>
         </van-grid-item>
@@ -48,6 +48,11 @@ export default {
       required: true,
       type: Array,
       default: () => [] // 默认值给一个空数组 表示此函数默认返回一个空数组
+    },
+    activeIndex: {
+      required: true,
+      type: Number,
+      default: 0
     }
   },
   methods: {
