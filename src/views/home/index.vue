@@ -16,7 +16,7 @@
         <ArticleList @showAction="openAction" :channel_id="item.id"></ArticleList>
       </van-tab>
     </van-tabs>
-    <span class="bar_btn">
+    <span class="bar_btn" @click="showChannelEdit = true">
       <van-icon name="wap-nav"></van-icon>
     </span>
     <!-- 放置一个弹层组件 -->
@@ -26,6 +26,11 @@
       <!-- 不喜欢文章和举报文章用一个方法 -->
       <MoreAction @dislike="dislikeOrReport('dislike')" @report="dislikeOrReport('report', $event)"/>
     </van-popup>
+    <!-- 频道编辑组件放在弹出面板的组件 -->
+    <van-action-sheet :round="false" v-model="showChannelEdit" title="编辑频道">
+      <!-- 放置频道编辑组件 -->
+      <ChannelEdit></ChannelEdit>
+    </van-action-sheet>
   </div>
 </template>
 
@@ -35,17 +40,19 @@ import MoreAction from './components/more-action'
 import { getMyChannels } from '@/api/channels'
 import { dislikeArticle, reportArticle } from '@/api/articles'
 import eventbus from '@/utils/eventbus' // 公共事件处理器
+import ChannelEdit from './components/channel-edit' // 引入编辑频道组件
 export default {
   name: 'Home',
   components: {
-    ArticleList, MoreAction
+    ArticleList, MoreAction, ChannelEdit
   },
   data () {
     return {
       channels: [], // 接收频道数据
       showMoreAction: false, // 是否显示弹层 默认不显示
       articleId: null, // 用来接收点击的文章id
-      activeIndex: 0 // 当前默认激活的页签0
+      activeIndex: 0, // 当前默认激活的页签0
+      showChannelEdit: false // 是否显示频道编辑组件 默认不显示
     }
   },
   methods: {
@@ -109,6 +116,18 @@ export default {
 }
 </script>
 <style lang="less" scoped>
+// 处理面板样式
+.van-action-sheet {
+  max-height: 100%;
+  height: 100%;
+  .van-action-sheet__header {
+    background: #3296fa;
+    color: #fff;
+    .van-icon-close {
+      color: #fff;
+    }
+  }
+}
 .van-tabs {
   height: 100%;
   display: flex;
