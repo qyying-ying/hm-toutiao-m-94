@@ -30,7 +30,7 @@
     <van-action-sheet :round="false" v-model="showChannelEdit" title="编辑频道">
       <!-- 放置频道编辑组件 -->
       <!-- 此时将父组件的数据传递给了子组件 -->
-      <ChannelEdit @delChannel="delChannel" :activeIndex="activeIndex" @selectChannel="selectChannel" :channels="channels"></ChannelEdit>
+      <ChannelEdit @addChannel="addChannel" @delChannel="delChannel" :activeIndex="activeIndex" @selectChannel="selectChannel" :channels="channels"></ChannelEdit>
     </van-action-sheet>
   </div>
 </template>
@@ -38,7 +38,7 @@
 <script>
 import ArticleList from './components/article-list'
 import MoreAction from './components/more-action'
-import { getMyChannels, delChannel } from '@/api/channels'
+import { getMyChannels, delChannel, addChannel } from '@/api/channels'
 import { dislikeArticle, reportArticle } from '@/api/articles'
 import eventbus from '@/utils/eventbus' // 公共事件处理器
 import ChannelEdit from './components/channel-edit' // 引入编辑频道组件
@@ -74,8 +74,15 @@ export default {
         this.$gnotify({ message: '删除频道失败' })
       }
     },
+    // 添加频道的方法
+    async addChannel (channel) {
+      // 调用api 将频道写入缓存 成功之后要将该频道添加到data数据中
+      await addChannel(channel) // 传入参数 写入缓存
+      this.channels.push(channel)
+    },
     async getMyChannels () {
       const data = await getMyChannels() // 接收返回的数据结果
+
       this.channels = data.channels // 将数据赋值给data中的数据
     },
     // 当子组件触发selectChannel时 触发该方法
