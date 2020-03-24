@@ -12,16 +12,21 @@
       </van-cell>
     </van-cell-group>
     <!-- 历史记录部分 搜索的内容 会在这里记录 -->
-    <div class="history-box" v-if="!q">
-    <!-- <div class="history-box" v-else> -->
-      <div class="head">
+    <!-- <div class="history-box" v-if="!q"> -->
+    <!-- 如果没有历史记录 隐藏掉  -->
+    <div class="history-box" v-else>
+      <!-- 只有当历史记录存在的时候 才显示头部 -->
+      <div class="head" v-if="historyList.length">
         <span>历史记录</span>
         <van-icon name="delete"></van-icon>
       </div>
       <van-cell-group>
-        <van-cell>
-          <a class="word_btn">电脑</a>
-          <van-icon class="close_btn" slot="right-icon" name="cross" />
+        <!-- 需要把这个位置变成动态的 -->
+        <van-cell v-for="(item,index) in historyList" :key="index">
+          <!-- 显示循环内容 -->
+          <a class="word_btn">{{ item }}</a>
+          <!-- 注册点击叉号事件 -->
+          <van-icon @click="delHistory(index)" class="close_btn" slot="right-icon" name="cross" />
         </van-cell>
       </van-cell-group>
     </div>
@@ -29,13 +34,29 @@
 </template>
 
 <script>
+const key = 'hm-94-toutiao-history' // 此key用来作为 历史记录在本地缓存中的key
 export default {
   name: 'search',
   data () {
     return {
-      q: '' // 关键字的数据
+      q: '', // 关键字的数据
+      // 当data初始化的时候 会读取后面数据
+      historyList: JSON.parse(localStorage.getItem(key) || '[]') // 作为一个数据变量 接收 搜索历史记录
+    }
+  },
+  methods: {
+    // 删除历史
+    delHistory (index) {
+      // 删除要先在data中删除数据 然后把data中的数据同步到 本地缓存中
+      this.historyList.splice(index, 1) // 直接删除对应的历史记录数据
+      // 将数据同步到本地缓存
+      localStorage.setItem(key, JSON.stringify(this.historyList))
     }
   }
+  // created () {
+  //   // 钩子函数 实例初始化之后
+  //   this.historyList = JSON.parse(localStorage.getItem(key) || '[]')
+  // }
 }
 </script>
 
