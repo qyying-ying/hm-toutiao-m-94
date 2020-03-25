@@ -4,7 +4,7 @@
     <van-nav-bar left-arrow title="搜索中心" @click-left="$router.back()"></van-nav-bar>
     <!-- 导航 -->
     <!-- 搜索组件 -->
-    <van-search v-model.trim="q"  placeholder="请输入搜索关键词" shape="round" />
+    <van-search @search="onSearch" v-model.trim="q"  placeholder="请输入搜索关键词" shape="round" />
     <!-- 联想内容 有输入内容时 显示联想-->
     <van-cell-group class="suggest-box" v-if="q">
       <van-cell icon="search">
@@ -18,15 +18,18 @@
       <!-- 只有当历史记录存在的时候 才显示头部 -->
       <div class="head" v-if="historyList.length">
         <span>历史记录</span>
-        <van-icon name="delete"></van-icon>
+        <!-- 清空操作 -->
+        <van-icon @click="clear" name="delete"></van-icon>
       </div>
       <van-cell-group>
         <!-- 需要把这个位置变成动态的 -->
-        <van-cell v-for="(item,index) in historyList" :key="index">
+        <van-cell @click="toSearchResult(item)" v-for="(item,index) in historyList" :key="index">
           <!-- 显示循环内容 -->
           <a class="word_btn">{{ item }}</a>
           <!-- 注册点击叉号事件 -->
-          <van-icon @click="delHistory(index)" class="close_btn" slot="right-icon" name="cross" />
+          <!-- 此时事件冒泡 js event.stopPagintion() -->
+          <!-- vue中可以用修饰符 直接阻止冒泡 -->
+          <van-icon @click.stop="delHistory(index)" class="close_btn" slot="right-icon" name="cross" />
         </van-cell>
       </van-cell-group>
     </div>
@@ -51,6 +54,39 @@ export default {
       this.historyList.splice(index, 1) // 直接删除对应的历史记录数据
       // 将数据同步到本地缓存
       localStorage.setItem(key, JSON.stringify(this.historyList))
+    },
+    // 跳到搜索结果页
+    toSearchResult (text) {
+      // 跳转到搜索结果页
+      // 第一种
+      // this.$router.push('/search/result?q=' + text) // 采用query传递参数 地址拼接参数
+      // 第二种
+      this.$router.push({ path: '/search/result', query: { q: text } })
+    },
+    // 清空历史记录
+    async clear () {
+      // 直接清空历史记录
+      try {
+        await this.$dialog.confirm({
+          title: '提示',
+          message: '您确定要删除所有历史记录吗'
+        })
+        this.historyList = [] // 将本地历史记录设置为空
+        localStorage.setItem(key, '[]') // 同步设置历史记录为空
+      } catch (error) {
+      // 失败不需要处理
+      }
+    },
+    onSearch () {
+      // 判断内容为空 直接返回
+      if (!this.q) return
+      // 应该在跳转之前 应该把搜索结果添加到历史记录
+      // 这里需要去重 用set
+      this.historyList.push(this.q) // 将搜索内容加到历史记录
+      this.historyList = Array.from(new Set(this.historyList))
+      localStorage.setItem(key, JSON.stringify(this.historyList)) // 设置到本地缓存
+      // 搜索事件触发的时候 应该跳到 搜索结果页 并且携带参数
+      this.$router.push({ path: '/search/result', query: { q: this.q } })
     }
   }
   // created () {
