@@ -7,8 +7,9 @@
     <van-search @search="onSearch" v-model.trim="q"  placeholder="请输入搜索关键词" shape="round" />
     <!-- 联想内容 有输入内容时 显示联想-->
     <van-cell-group class="suggest-box" v-if="q">
-      <van-cell icon="search">
-        <span>j</span>ava
+      <!-- 循环的搜索建议 -->
+      <van-cell @click="toResult(item)" icon="search" v-for="(item,index) in suggestList" :key="index">
+        {{ item }}
       </van-cell>
     </van-cell-group>
     <!-- 历史记录部分 搜索的内容 会在这里记录 -->
@@ -23,7 +24,7 @@
       </div>
       <van-cell-group>
         <!-- 需要把这个位置变成动态的 -->
-        <van-cell @click="toSearchResult(item)" v-for="(item,index) in historyList" :key="index">
+        <van-cell @click="toResult(item)" v-for="(item,index) in historyList" :key="index">
           <!-- 显示循环内容 -->
           <a class="word_btn">{{ item }}</a>
           <!-- 注册点击叉号事件 -->
@@ -37,6 +38,8 @@
 </template>
 
 <script>
+// import func from '../../../vue-temp/vue-editor-bridge'
+import { getSuggestion } from '@/api/articles' // 引入获取建议的接口
 const key = 'hm-94-toutiao-history' // 此key用来作为 历史记录在本地缓存中的key
 export default {
   name: 'search',
@@ -44,7 +47,47 @@ export default {
     return {
       q: '', // 关键字的数据
       // 当data初始化的时候 会读取后面数据
-      historyList: JSON.parse(localStorage.getItem(key) || '[]') // 作为一个数据变量 接收 搜索历史记录
+      historyList: JSON.parse(localStorage.getItem(key) || '[]'), // 作为一个数据变量 接收 搜索历史记录
+      suggestList: [] // 联想的搜索建议
+    }
+  },
+  watch: {
+    // q () {
+    // // 在这个位置请求接口
+    //   clearTimeout(this.timer)
+    //   // 防抖函数
+    //   this.timer = setTimeout(async () => {
+    //   // 需要判断 当清空的时候 不能发送请求 但是要把联想的建议清空
+    //     if (!this.q) {
+    //     // 如果这是搜索关键字没有内容
+    //       this.suggestList = []
+    //       // 不能再继续了
+    //       return
+    //     }
+    //     // 此函数中需要 请求 联想搜索的建议
+    //     const data = await getSuggestion({ q: this.q })
+    //     this.suggestList = data.options // 将返回的词条的option赋值给当前的联想意见
+    //   }, 300)
+    // }
+    // 函数节流
+    q () {
+      if (!this.timer) {
+        // 要求300毫秒执行一次
+        this.timer = setTimeout(async () => {
+        // 先将编辑设置为空
+          this.timer = null
+          // 需要判断 当清空的时候 不能发送请求 但是要把联想的建议清空
+          if (!this.q) {
+            // 如果这是搜索关键字没有内容
+            this.suggestList = []
+            // 不能再继续了
+            return
+          }
+          // 此函数中需要 请求 联想搜索的建议
+          const data = await getSuggestion({ q: this.q })
+          this.suggestList = data.options // 将返回的词条的option赋值给当前的联想意见
+        }, 300)
+      }
     }
   },
   methods: {
@@ -56,11 +99,22 @@ export default {
       localStorage.setItem(key, JSON.stringify(this.historyList))
     },
     // 跳到搜索结果页
-    toSearchResult (text) {
-      // 跳转到搜索结果页
-      // 第一种
-      // this.$router.push('/search/result?q=' + text) // 采用query传递参数 地址拼接参数
-      // 第二种
+    // toSearchResult (text) {
+    //   // 跳转到搜索结果页
+    //   // 第一种
+    //   // this.$router.push('/search/result?q=' + text) // 采用query传递参数 地址拼接参数
+    //   // 第二种
+    //   this.$router.push({ path: '/search/result', query: { q: text } })
+    // },
+    // 到结果页
+    toResult (text) {
+      // 应该把这个text 放到历史记录
+      this.historyList.push(text) // 加到历史记录
+      // 有可能重复
+      this.historyList = Array.from(new Set(this.historyList)) // 去重
+      // 设置到本地的缓存中
+      localStorage.setItem(key, JSON.stringify(this.historyList)) // 将历史记录设置到缓存
+      // 跳转到搜索结果
       this.$router.push({ path: '/search/result', query: { q: text } })
     },
     // 清空历史记录
