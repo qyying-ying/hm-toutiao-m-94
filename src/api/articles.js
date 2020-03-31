@@ -46,3 +46,11 @@ export function searchArticle (params) {
     params // 关键词 及分页信息
   })
 }
+/***
+ *获取文章详情
+ */
+export function getArticleInfo (artId) {
+  return request({
+    url: `/articles/${artId}` // 获取文章详情的地址
+  })
+}
