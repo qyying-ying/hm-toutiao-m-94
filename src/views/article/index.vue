@@ -20,7 +20,10 @@
         &nbsp;&nbsp;&nbsp;&nbsp;
         <van-button round size="small" :class="{active: article.attitude === 0}" plain icon="delete">不喜欢</van-button>
       </div>
+          <!-- 放置comment组件 -->
+        <Comment />
     </div>
+
     <!-- 放置一个遮罩层 -->
     <van-overlay :show="loading">
       <!-- 加载进度条 -->
@@ -35,7 +38,11 @@
 <script>
 import { getArticleInfo } from '@/api/articles'
 import { followUser, unfollowUser } from '@/api/user'
+import Comment from './components/comment' // 引入评论组件
 export default {
+  components: {
+    Comment
+  },
   data () {
     return {
       article: {}, // 接收文章详情数据
@@ -118,6 +125,7 @@ export default {
     position:sticky;
     background-color: #fff;
     top:46px;
+    z-index: 2;
     .text {
       flex: 1;
       padding-left: 10px;

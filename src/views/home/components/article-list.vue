@@ -32,7 +32,7 @@
               <!-- 作者信息 -->
               <div class="info_box">
                 <span>{{ item.aut_name }}</span>
-                <span>{{ item.comm_count }}</span>
+                <span>{{ item.comm_count }}评论</span>
                 <!-- 使用过滤器 -->
                 <span>{{ item.pubdate | relTime }}</span>
                 <!-- 叉号的显示应该根据当前的登录状态来判断 如果登陆了就显示叉号 没有登录就不显示叉号 -->
