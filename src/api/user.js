@@ -30,3 +30,11 @@ export function unfollowUser (autid) {
     method: 'delete'
   })
 }
+/***
+ *获取用户个人资料
+ */
+export function getUserInfo () {
+  return request({
+    url: '/user'
+  })
+}
