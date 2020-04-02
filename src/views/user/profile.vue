@@ -12,7 +12,7 @@
           src="https://img.yzcdn.cn/vant/cat.jpeg"
         />
       </van-cell>
-      <van-cell is-link title="名称" value="用户名称" />
+      <van-cell is-link title="名称" @click="showName= true" :value="user.name" />
       <van-cell is-link title="性别" value='男'/>
       <van-cell is-link title="生日" value="2019-08-08" />
     </van-cell-group>
@@ -27,9 +27,12 @@
     </van-popup>
     <!-- 放置昵称弹层 -->
     <!-- 弹昵称 -->
-    <van-popup v-model="showName" style="width:80%">
+    <van-popup v-model="showName" style="width:80%" :close-on-click-overlay="false">
        <!-- 编辑用户昵称  双向绑定用户的昵称-->
-       <van-field  type='textarea'  rows="4"></van-field>
+       <!-- trim修饰符 去掉名称的前后空格 -->
+       <van-field :error-message="nameMsg" v-model.trim ="user.name"  type='textarea'  rows="4"></van-field>
+       <!-- 放置一个按钮 用来确定关闭弹层 -->
+       <van-button block type="info" size='normal' @click="btnName">确定</van-button>
     </van-popup>
     <!-- 性别弹层 -->
     <van-action-sheet :actions="actions" v-model="showGender" cancel-text="取消"></van-action-sheet>
@@ -58,7 +61,27 @@ export default {
       minDate: new Date(1900, 1, 1), // 生日组件 选择的最小日期
       maxDate: new Date(),
       currentDate: new Date(), // 当弹出层是 显示的时间 是今天
-      actions: [{ name: '男' }, { name: '女' }]
+      actions: [{ name: '男' }, { name: '女' }],
+      nameMsg: '', // 错误信息
+      user: {
+        // 放置个人资料信息
+        name: '', // 用户名称
+        gender: 1, // 性别默认值
+        birthday: '', // 生日默认值
+        photo: '' // 用户头像
+      }
+    }
+  },
+  methods: {
+    btnName () {
+      // 关闭弹层
+      if (this.user.name.length < 1 || this.user.name.length > 7) {
+        // 此时说明长度不符合要求
+        this.nameMsg = '用户昵称的长度应该是1-7的长度要求'
+        return // 不能继续
+      }
+      this.nameMsg = '' // 直接将错误信息清空
+      this.showName = false
     }
   }
 }
