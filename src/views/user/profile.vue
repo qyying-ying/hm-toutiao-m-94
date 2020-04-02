@@ -13,8 +13,8 @@
         />
       </van-cell>
       <van-cell is-link title="名称" @click="showName= true" :value="user.name" />
-      <van-cell is-link title="性别" value='男'/>
-      <van-cell is-link title="生日" value="2019-08-08" />
+      <van-cell is-link title="性别" @click="showGender= true" :value="user.gender === 0 ? '男' : '女' "/>
+      <van-cell is-link title="生日" @click="showDate" :value="user.birthday" />
     </van-cell-group>
      <!-- 放置 头像弹层 -->
       <!-- 弹层组件 -->
@@ -35,7 +35,7 @@
        <van-button block type="info" size='normal' @click="btnName">确定</van-button>
     </van-popup>
     <!-- 性别弹层 -->
-    <van-action-sheet :actions="actions" v-model="showGender" cancel-text="取消"></van-action-sheet>
+    <van-action-sheet @select="selectItem" :actions="actions" v-model="showGender" cancel-text="取消"></van-action-sheet>
     <!-- 生日弹层 -->
     <van-popup v-model="showBirthDay" position="bottom">
       <!-- 选择出生日期  出生日期应该小于现在时间-->
@@ -45,12 +45,16 @@
            type="date"
           :min-date="minDate"
           :max-date="maxDate"
+          @confirm="confirmDate"
+          @cancel= "showBirthDay=false"
          />
     </van-popup>
   </div>
 </template>
 
 <script>
+import { getUserProfile } from '@/api/user'
+import dayjs from 'dayjs'
 export default {
   data () {
     return {
@@ -73,6 +77,10 @@ export default {
     }
   },
   methods: {
+    // 封装方法
+    async getUserProfile () {
+      this.user = await getUserProfile()
+    },
     btnName () {
       // 关闭弹层
       if (this.user.name.length < 1 || this.user.name.length > 7) {
@@ -82,7 +90,28 @@ export default {
       }
       this.nameMsg = '' // 直接将错误信息清空
       this.showName = false
+    },
+    selectItem (item, index) {
+      this.user.gender = index
+      // 手动关闭弹层
+      this.showGender = false
+      // index 0 男 1 女
+      // 通过item或者 index可以得到 点击是男还是女
+    },
+    // 显示生日弹层
+    showDate () {
+      this.showBirthDay = true // 显示生日弹层
+      this.currentDate = new Date(this.user.birthday)
+    },
+    // 确定生日
+    confirmDate () {
+      // 当前选择的生日
+      this.user.birthday = dayjs(this.currentDate).format('YYYY-MM-DD') // 将data类型转化为字符串
+      this.showBirthDay = false // 关闭弹层
     }
+  },
+  created () {
+    this.getUserProfile() // 获取用户资料
   }
 }
 </script>
