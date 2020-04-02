@@ -56,3 +56,14 @@ export function updatePhoto (data) {
     data
   })
 }
+/******
+ *  保存用户信息
+ *
+ * **/
+export function saveUserInfo (data) {
+  return request({
+    url: '/user/profile',
+    method: 'patch',
+    data: { ...data, photo: null } // 直接将photo设置为空
+  })
+}

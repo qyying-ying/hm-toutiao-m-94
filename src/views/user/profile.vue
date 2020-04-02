@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <van-nav-bar left-arrow @click-left="$router.back()" title="编辑资料" right-text="保存" ></van-nav-bar>
+    <van-nav-bar @click-right="saveUser" left-arrow  @click-left="$router.back()" title="编辑资料" right-text="保存" ></van-nav-bar>
     <van-cell-group>
       <van-cell is-link title="头像"  center>
         <van-image
@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { getUserProfile, updatePhoto } from '@/api/user'
+import { getUserProfile, updatePhoto, saveUserInfo } from '@/api/user'
 import dayjs from 'dayjs'
 export default {
   data () {
@@ -126,6 +126,15 @@ export default {
       const result = await updatePhoto(data) // 上传头像
       this.user.photo = result.photo // 把成功上传的头像地址设置给当前data中的数据
       this.showPhoto = false // 关闭头像弹层
+    },
+    // 保存用户信息
+    async saveUser () {
+      try {
+        await saveUserInfo(this.user) // 传入user对象
+        this.$gnotify({ type: 'success', message: '保存成功' })
+      } catch (error) {
+        this.$gnotify({ message: '保存失败' })
+      }
     }
   },
   created () {
