@@ -2,7 +2,7 @@
   <!-- 可以做上拉加载 -->
   <!-- div目的是形成滚动条 -->
   <!-- 阅读记忆 -->
-  <div class="scroll-wrapper">
+  <div class="scroll-wrapper" @scroll="remember">
     <!-- van-list组件 如果不加干涉, 初始化完毕 就会检测 自己距离底部的长度,如果超过了限定 ,就会执行 load事件  自动把
     绑定的 loading 变成true-->
     <!-- 下拉刷新组件包裹 列表组件 -->
@@ -87,7 +87,8 @@ export default {
       upLoading: false,
       finished: false,
       articles: [], // 文章列表
-      timestamp: null // 定义一个时间戳 用来存储历史时间戳
+      timestamp: null, // 定义一个时间戳 用来存储历史时间戳
+      scrollTop: 0 // 定义滚动的位置
     }
   },
   // props 对象形式 可以约束传入的值 必填 传值类型
@@ -100,6 +101,15 @@ export default {
     }
   },
   methods: {
+    // 记录滚动事件
+    remember (event) {
+      // 函数防抖 在一定时间内 只执行最后一次
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
+        // 记录滚动到哪个位置
+        this.scrollTop = event.target.scrollTop // 记录滚动的位置
+      }, 500)
+    },
     // 上拉加载
     async onLoad () {
       console.log('开始加载文章列表数据')

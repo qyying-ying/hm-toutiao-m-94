@@ -7,7 +7,11 @@
     <!-- 二级路由容器 -->
     <!-- 判断当前的地址 如果是/uesr 就给一个noTopClass -->
     <div class="my-wrapper" :class="{noTop: !showNavBar}">
-    <router-view></router-view>
+    <!-- 直接缓存二级路由容器 直接使用keep-alive组件包裹容器 -->
+    <keep-alive>
+      <!-- 一旦被包裹 路由容器里的组件就不会被销毁 -->
+      <router-view></router-view>
+    </keep-alive>
     </div>
     <!-- 标签组件 -->
     <!-- 标签栏  开启路由模式 route :route="true"(布尔)  route="true"(字符串)-->
