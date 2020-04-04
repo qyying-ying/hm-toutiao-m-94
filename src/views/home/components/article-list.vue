@@ -2,7 +2,7 @@
   <!-- 可以做上拉加载 -->
   <!-- div目的是形成滚动条 -->
   <!-- 阅读记忆 -->
-  <div class="scroll-wrapper" @scroll="remember">
+  <div class="scroll-wrapper" @scroll="remember" ref="myScroll">
     <!-- van-list组件 如果不加干涉, 初始化完毕 就会检测 自己距离底部的长度,如果超过了限定 ,就会执行 load事件  自动把
     绑定的 loading 变成true-->
     <!-- 下拉刷新组件包裹 列表组件 -->
@@ -74,6 +74,25 @@ export default {
           // 说明数据删光了
           this.onLoad() // 手动的触发onload事件 给页面加数据
         }
+      }
+    })
+    eventBus.$on('changeTab', (id) => {
+      // 传入的id就是当前被激活的id
+      // 要判断 当前的文章列表接受的id 是否等于此id 如果相等 表示该文章列表实例 就是需要去滚动的实例
+      // 一个tab页 下一个实例
+      if (id === this.channel_id) {
+        // 为什么这里 没有实现效果 因为 tab页切换事件 执行之后 article-list组件渲染 是异步的 没有办法 立刻得出渲染结果
+        // 如果相等 表示 我要滚动此滚动条
+        // 此时得不到 this.$refs.myScroll
+        // 怎么才能保证  执行 该代码时  已经完成了上一次的渲染呢
+        // this.$nextTick()  因为 vue是异步渲染, 如果想要等到上一次的结果 渲染完成  可以 在 this.$nextTick中处理
+        this.$nextTick(() => {
+          // 此时可以保证 之前的上一次的异步渲染已经完成
+          if (this.scrollTop && this.$refs.myScroll) {
+          // 当滚动距离不为0 并且 滚动元素 存在的情况下 才去滚动
+            this.$refs.myScroll.scrollTop = this.scrollTop // 滚动到固定位置
+          }
+        })
       }
     })
   },
@@ -178,6 +197,13 @@ export default {
       //   this.downLoading = false
       //   this.successText = `更新了${arr.length}条数据`
       // }, 1000)
+    }
+  },
+  activated () {
+    // 可以在激活函数中 判断当前是否 scrollTop发声了变化
+    if (this.$refs.myScroll && this.scrollTop) {
+      // 判断滚动位置是否大于0
+      this.$refs.myScroll.scrollTop = this.scrollTop // 将记录的位置滚动到对应位置
     }
   }
 }

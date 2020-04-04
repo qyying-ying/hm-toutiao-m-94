@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- 默认绑定激活页签 -->
-    <van-tabs v-model="activeIndex">
+    <van-tabs v-model="activeIndex" @change="changeTab">
       <van-tab :title="item.name" v-for="item in channels" :key="item.id">
         <!-- 生成若干个单元格 -->
         <!-- <div class="scroll-wrapper">
@@ -57,6 +57,12 @@ export default {
     }
   },
   methods: {
+    // 切换页签事件
+    changeTab () {
+      // 切换页签时 要广播一个消息 让对应的页签中的文章列表 去滚动 滚动条
+      // 广播中传出一个参数 传当前谁被激活了 传出当前基础索引的id
+      eventbus.$emit('changeTab', this.channels[this.activeIndex].id)
+    },
     // 删除频道的方法
     async delChannel (id) {
       // 此时应该先调用api
